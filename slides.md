@@ -55,13 +55,15 @@ Então, cada kb conta.
 
 Dando só um `npm install`, `npm build` a ideia é listar aqui o peso de 3 top frameworks do mercado.
 
---
+---
 
 Entendo que é um caso de uso bem específico mas enfim, vamos pra parte divertida :)
 
 ---
 
 ## Arquitetura da nossa aplicação - MEJNS
+
+Então pra seguir a linha do caso de uso, iremos reproduzir um chat.
 
 A ideia de utilizar "só javascript puro" é que vamos usar nossos conhecimentos de Javascript no servidor também. Então usaremos:
 
@@ -125,3 +127,43 @@ Pra acessar:
 
 ---
 
+## EJS Install
+
+Beleza mas isso não faz muita coisa, bora instalar o EJS.
+
+O EJS servirá pra gente cuidar dos nossos templates. Pra isso setamos três coisas, a nossa pasta pública, onde iremos colocar nossos assets, a pasta views, onde iremos colocar nossos templates e, claro, avisar o sistema que é pra usar o ejs de engine.
+
+`npm install ejs --save`
+
+```
+// index.js
+
+app.use(express.static(__dirname + '/public'));
+
+app.set('views', __dirname + '/views');
+app.set('view engine', 'ejs');
+
+```
+---
+
+## EJS Hello World
+
+`mkdir views`
+`mkdir views/pages`
+`cd views/pages`
+`touch view/pages/chat.ejs`
+
+```
+// view/pages/chat.ejs
+
+<h1> Hello TDC </h1>
+```
+
+```
+// index.js
+
+app.get('/', function(req, res) {
+  res.render('pages/chat');
+});
+```
+---
