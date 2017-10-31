@@ -1,1 +1,63 @@
-<h1>Hello TDC</h1>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <title>Chat real time utilizando Javascript puro em 2017</title>
+    <meta name="description" content="Aplicação desenvolvida para a palestra Aplicações real time utilizando Javascript puro em 2017 no The Developers Conference Porto Alegre 2017"> 
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <style>
+        .message {
+            margin-top: 20px;
+            overflow: hidden;
+        }
+        .form {
+            position: fixed;
+            bottom: 20px;
+            left: 0px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+  <div class="container">
+        
+        <div class="message">
+            <div class="card w-55 float-left bg-light">
+                <div class="card-body">
+                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="message">
+            <div class="card w-55 float-right bg-info text-white">
+                <div class="card-body">
+                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                </div>
+            </div>
+        </div>
+
+  </div>
+
+
+
+  <div class="form">
+      <div class="container">
+        <form class="card">
+                <div class="card-body">
+            <div class="row">
+                <div class="col-11">
+                    <input type="text" class="form-control" placeholder="First name">
+                </div>
+                <div class="col">
+                    <button class="btn btn-info btn-block">></button>
+                </div>
+            </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+</body>
+</html>
