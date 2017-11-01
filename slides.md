@@ -363,7 +363,7 @@ module.exports = function(app) {
 
 ```
 
-E agora vamos criar os controllers que serão chamados à partir das rotas. Pra demonstrar agora precisaremos somente de dois, um para listar todas as mensagems e um para salvar no banco uma mensagem recebida.
+E agora vamos criar os controllers que serão chamados à partir das rotas. Pra demonstrar agora precisaremos somente de dois, um para listar todas as mensagens e um para salvar no banco uma mensagem recebida.
 
 
 ```
