@@ -15,7 +15,7 @@
 
 Acho que é interessante a gente definir alguns termos. Por Javascript puro eu quero dizer sem frameworks ou tools conhecidas como falamos anteriormente, ou qualauer outra que seja. É escrever o javascript e ele rodar no browser sem nada *no front end*.
 
-Porém, não quer dizer que não iremos utilizar coisas mais modernas
+Porém, não quer dizer que não iremos utilizar coisas mais modernas no back end.
 
 ---
 
@@ -63,7 +63,7 @@ Entendo que é um caso de uso bem específico mas enfim, vamos pra parte diverti
 
 ## Arquitetura da nossa aplicação - MEJNS
 
-Então pra seguir a linha do caso de uso, iremos reproduzir um chat.
+Então pra seguir a linha do caso de uso, iremos reproduzir um chat que servirá de interface para uma conversa de um usuário com um bot, no caso o bot será nós mesmos com o curl pelo terminal.
 
 A ideia de utilizar "só javascript puro" é que vamos usar nossos conhecimentos de Javascript no servidor também. Então usaremos:
 
@@ -164,7 +164,8 @@ app.set('view engine', 'ejs');
 
 app.get('/', function(req, res) {
   res.render('pages/chat');
-});
+});.
+
 ```
 ---
 
@@ -215,28 +216,213 @@ app.get('/', function(req, res) {
 
   </div>
 
-
-
   <div class="form">
       <div class="container">
         <form class="card">
-                <div class="card-body">
-            <div class="row">
-                <div class="col-11">
-                    <input type="text" class="form-control" placeholder="First name">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-11">
+                        <input type="text" class="form-control" placeholder="First name">
+                    </div>
+                    <div class="col">
+                        <button class="btn btn-info btn-block">></button>
+                    </div>
                 </div>
-                <div class="col">
-                    <button class="btn btn-info btn-block">></button>
-                </div>
-            </div>
             </div>
         </form>
     </div>
 </div>
-
 
 </body>
 </html>
 
 
 ```
+
+
+## Cria models e controllers da aplicação
+
+Tá começando a crescer os arquivos, vamos organizar melhor e colocar tudo dentro duma pasta /app.
+
+`mkdir app`
+
+`mv views/ app/`
+
+
+`npm install mongoose --save`
+`npm install body-parser --save`
+
+
+```
+// index.js
+
+var express = require('express');
+var app = express();
+var mongoose   = require('mongoose');
+var Message = require('./app/models/messageModel');
+var bodyParser = require('body-parser');
+
+app.set('port', (process.env.PORT || 3000));
+
+app.use(express.static(__dirname + '/public'));
+
+mongoose.Promise = global.Promise;
+mongoose.connect(process.env.MONGOURL);
+
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
+app.set('views', __dirname + '/app/views');
+app.set('view engine', 'ejs');
+
+app.get('/', function(req, res) {
+  res.render('pages/chat');
+});
+
+//CORS middleware
+var allowCrossDomain = function(req, res, next) {
+  
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+
+    next();
+
+}
+  
+app.use(allowCrossDomain);
+
+var routes = require('./app/routes/messageRoutes');
+routes(app);
+  
+app.listen(app.get('port'), function() {
+  console.log('Node app is running on http://localhost:' + app.get('port'));
+});
+```
+
+Agora bora criar os arquivos do backend
+
+`mkdir app/controllers`
+`mkdir app/models`
+`mkdir app/routes`
+
+`cd app/controllers`
+`touch messageController.js`
+
+`cd ../`
+`cd models`
+`touch messageModel.js`
+
+`cd ../`
+`cd routes`
+`touch messageRoutes.js`
+
+
+Bora criar a estrutura das nossas mensagens
+
+```
+// app/models/messageModel.js
+
+var mongoose = require('mongoose');
+var Schema = mongoose.Schema;
+
+
+var MessageSchema = new Schema({
+    send_at: {
+        type: Date,
+        default: Date.now
+    },
+    status: {
+        type: String
+    },
+    content: {
+        type: String
+    }
+});
+
+
+module.exports = mongoose.model('Messages', MessageSchema);
+
+```
+
+Agora vamos criar as rotas necessárias pra nossa aplicação
+
+```
+// app/routes/messageRoutes.js
+
+
+module.exports = function(app) {
+    
+    var message = require('../controllers/messageController');
+
+    app.route('/messages')
+        .get(message.list)
+        .post(message.create);
+
+};
+
+```
+
+E agora vamos criar os controllers que serão chamados à partir das rotas. Pra demonstrar agora precisaremos somente de dois, um para listar todas as mensagems e um para salvar no banco uma mensagem recebida.
+
+
+```
+// app/controllers/messageController.js
+
+var mongoose = require('mongoose');
+var Message = mongoose.model('Messages');
+
+exports.list = function(req, res) {
+
+    Message.find({}, function(err, message) {
+        if (err)
+            res.send(err);
+        res.json(message);
+    });
+
+}; 
+
+
+exports.create = function(req, res) {
+
+    var newMessage = new Message(req.body);
+
+    newMessage.save(function(err, message) {
+        if (err)
+            res.send(err);
+        res.json(message);
+    });
+
+};
+
+
+```
+
+### Exemplo de requisição pra teste do backend
+
+Mensagem enviada pelo usuário:
+
+```
+curl -X POST -v \
+-H 'Content-Type: application/json' \
+-H 'Accept: application/json' \
+-d '{
+  "content":"Lorem Ipsum Usuário",
+  "status": "sent"
+}' \
+'http://localhost:3000/messages'
+```
+
+Mensagem enviada pela plataforma:
+
+```
+curl -X POST -v \
+-H 'Content-Type: application/json' \
+-H 'Accept: application/json' \
+-d '{
+  "content":"Lorem Ipsum Plataforma",
+  "status": "received"
+}' \
+'http://localhost:3000/messages'
+```
+
