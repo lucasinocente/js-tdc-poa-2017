@@ -485,3 +485,65 @@ exports.chat = function(req, res) {
 ```
 
 E claro, remover a rota `/` do `index.js`.
+
+
+
+### Fazer mensagem que vem do servidor aparecer em tempo real na view
+
+Instala socket.io
+
+`npm install socket.io --save`
+
+Emit mensagem de teste
+
+```
+// index.js
+
+--
+var app = express();
+
+++
+
+var app = require('express')();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
+
+
+--
+app.listen(app.get('port'), function() {
+  console.log('Node app is running on http://localhost:' + app.get('port'));
+});
+
+++
+io.on('connection', function(socket){
+  console.log('a user connected');
+});
+
+http.listen(app.get('port'), function() {
+  console.log('Node app is running on http://localhost:' + app.get('port'));
+});
+
+```
+
+Faz mensagem aparecer na home
+
+`mkdir public/javascripts`
+
+`touch public/javascripts/scripts.js`
+
+```
+// /public/javascripts/scripts.js
+
+var socket = io();
+
+```
+
+
+```
+// /app/views/pages/chat.js
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/javascripts/scripts.js"></script>
+
+```
+

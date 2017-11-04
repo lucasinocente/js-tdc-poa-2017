@@ -1,5 +1,7 @@
 var express = require('express');
-var app = express();
+var app = require('express')();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
 var mongoose   = require('mongoose');
 var Message = require('./app/models/messageModel');
 var bodyParser = require('body-parser');
@@ -28,12 +30,16 @@ var allowCrossDomain = function(req, res, next) {
     next();
 
 }
+
+io.on('connection', function(socket){
+  console.log('a user connected');
+});
   
 app.use(allowCrossDomain);
 
 var routes = require('./app/routes/messageRoutes');
 routes(app);
   
-app.listen(app.get('port'), function() {
+http.listen(app.get('port'), function() {
   console.log('Node app is running on http://localhost:' + app.get('port'));
 });
