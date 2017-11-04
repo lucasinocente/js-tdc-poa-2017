@@ -12,6 +12,9 @@ var MessageSchema = new Schema({
     },
     content: {
         type: String
+    },
+    room: {
+        type: String
     }
 });
 

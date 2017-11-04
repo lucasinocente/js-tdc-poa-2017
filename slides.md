@@ -752,3 +752,61 @@ function scrollToBottom() {
 }
 
 ```
+
+---
+
+### Separar por sala
+
+Pra separar por sala, precisamos criar um novo value no Schema de mensagem:
+
+```
+// /app/models/messageModel.js
+
+    room: {
+        type: String
+    }
+
+```
+
+Adicionar uma nova rota no nosso routes:
+
+```
+// /app/routes/messageRoutes.js
+
+app.route('/:room')
+        .get(message.chat)
+
+```
+
+E no nosso controller, ler essa informação:
+
+```
+// /app/controllers/messageController.js
+
+exports.chat = function(req, res) {
+
+    var room = req.params.room
+
+    Message.find({ 'room': room }, function(err, messages) {
+        if (err)
+            res.send(err);
+        res.render('pages/chat', {messages: messages});
+    });
+
+}; 
+
+```
+
+Mensagem de teste:
+
+```
+curl -X POST -v \
+-H 'Content-Type: application/json' \
+-H 'Accept: application/json' \
+-d '{
+  "content":"Lorem Ipsum Plataforma sala 1",
+  "status": "received",
+  "room": "1"
+}' \
+'http://localhost:3000/messages'
+```
