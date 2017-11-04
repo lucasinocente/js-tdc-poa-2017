@@ -29,9 +29,12 @@ exports.create = function(req, res) {
     var newMessage = new Message(req.body);
 
     newMessage.save(function(err, message) {
-        if (err)
+        if (err) {
             res.send(err);
-        res.json(message);
+        } else {
+            io.emit('message', message);
+            res.json(message);
+        }
     });
 
 };

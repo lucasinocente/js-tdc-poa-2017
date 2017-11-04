@@ -1,7 +1,7 @@
 var express = require('express');
 var app = require('express')();
 var http = require('http').Server(app);
-var io = require('socket.io')(http);
+io = require('socket.io')(http);
 var mongoose   = require('mongoose');
 var Message = require('./app/models/messageModel');
 var bodyParser = require('body-parser');
@@ -34,6 +34,7 @@ var allowCrossDomain = function(req, res, next) {
 io.on('connection', function(socket){
   console.log('a user connected');
 });
+
   
 app.use(allowCrossDomain);
 

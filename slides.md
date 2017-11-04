@@ -486,9 +486,97 @@ exports.chat = function(req, res) {
 
 E claro, remover a rota `/` do `index.js`.
 
+Depois disso precisamos editar o index.ejs:
+
+```
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <title>Chat real time utilizando Javascript puro em 2017</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Aplicação desenvolvida para a palestra Aplicações real time utilizando Javascript puro em 2017 no The Developers Conference Porto Alegre 2017"> 
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <style>
+        .message {
+            margin-top: 20px;
+            overflow: hidden;
+        }
+        .form {
+            position: fixed;
+            bottom: 20px;
+            left: 0px;
+            width: 100%;
+        }
+        .chat {
+            padding-bottom: 140px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="chat">
+    <div class="container" id="container">
+
+        <% messages.forEach(function(message,index) { %>
+            
+            <div class="message">
+
+                <% if (message.status == "received") { %>
+                
+                    <div class="card w-55 float-left bg-light">
+                        <div class="card-body">
+                            <p class="card-text"><%= message.content %></p>
+                        </div>
+                    </div>
+
+                <% } else { %>
+
+                    <div class="card w-55 float-right bg-info text-white">
+                        <div class="card-body">
+                            <p class="card-text"><%= message.content %></p>
+                        </div>
+                    </div>
+
+                <% } %>
+
+            </div>
+
+        <% }); %>
+
+    </div>
 
 
-### Fazer mensagem que vem do servidor aparecer em tempo real na view
+    <div class="form">
+        <div class="container">
+            <form class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-9 col-sm-10">
+                            <input type="text" class="form-control" placeholder="First name">
+                        </div>
+                        <div class="col-3 col-sm-2">
+                            <button class="btn btn-info btn-block">></button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>
+
+
+```
+
+---
+
+### Fazer mensagem que vem do servidor aparecer em tempo real no console.
+
+### Hello World Socket.io
 
 Instala socket.io
 
@@ -525,7 +613,7 @@ http.listen(app.get('port'), function() {
 
 ```
 
-Faz mensagem aparecer na home
+Faz mensagem aparecer no console
 
 `mkdir public/javascripts`
 
@@ -539,6 +627,7 @@ var socket = io();
 ```
 
 
+
 ```
 // /app/views/pages/chat.js
 
@@ -547,3 +636,119 @@ var socket = io();
 
 ```
 
+---
+
+### Faz mensagem do servidor aparecer na view
+
+Pra fazer o socket enviar a partir dos controllers tb precisamos deixar a io global.
+
+Só trocar `var io = require('socket.io')(http);` por `io = require('socket.io')(http);`
+
+Depois, precisamos enviar a mensagem que é salva pra view, pra isso editaremos o controller de create e emitir utilizar o `io.emit`.
+
+```
+// /app/controllers/messageController.js
+
+exports.create = function(req, res) {
+
+    var newMessage = new Message(req.body);
+
+    newMessage.save(function(err, message) {
+        if (err) {
+            res.send(err);
+        } else {
+            io.emit('message', message);
+            res.json(message);
+        }
+    });
+
+};
+
+```
+Se adicionarmos um console log enxergaremos algo tipo:
+
+```
+// public/javascripts.js
+
+var socket = io();
+
+socket.on('message', function(message){
+
+    console.log('message', message);
+
+});
+
+```
+
+`message {__v: 0, content: "Lorem Ipsum Plataforma", status: "received", _id: "59fe38471faa5e441c22a940", send_at: "2017-11-04T21:59:35.551Z"}`
+
+---
+
+### Faz mensagem aparecer na view
+
+Agora é a parte legal, com o conteúdo sendo enviado pelo socket pra view, precisamos somente criar os elementos e joga-los no DOM.
+
+Bora lá:
+
+(Explicar código)
+
+```
+// public/javascripts/scripts.js
+
+var socket = io();
+
+socket.on('message', function(message){
+    renderTemplate(message);
+});
+
+function renderTemplate(message) {
+
+    var node = createNode();
+
+    node.className = 'message';
+    node.innerHTML = getMessageHtml(message);
+
+    appendMessage(node);
+
+}
+
+
+function createNode() {
+    return node = document.createElement('div');
+}
+
+function getMessageHtml(message) {
+
+    var className = getClassName(message.status);
+
+    return content = '<div class="' + className + '"> \
+                          <div class="card-body">\
+                              <p class="card-text"> '+ message.content +'</p> \
+                          </div> \
+                      </div>';
+
+}
+
+function getClassName(status) {
+
+    var className;
+
+    if (status == "received") {
+        className = "card w-55 float-left bg-light";
+    } else {
+        className = "card w-55 float-right bg-info text-white";
+    }
+
+    return className;
+}
+
+function appendMessage(node) {
+    document.getElementById("container").appendChild(node);
+    scrollToBottom();
+}
+
+function scrollToBottom() {
+    window.scrollTo( 0, document.body.scrollHeight );
+}
+
+```
