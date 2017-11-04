@@ -3,7 +3,7 @@ var Message = mongoose.model('Messages');
 
 
 exports.list = function(req, res) {
-
+    
     Message.find({}, function(err, message) {
         if (err)
             res.send(err);
@@ -12,6 +12,17 @@ exports.list = function(req, res) {
 
 }; 
 
+
+exports.chat = function(req, res) {
+
+    Message.find({}, function(err, messages) {
+        if (err)
+            res.send(err);
+        res.render('pages/chat', {messages: messages});
+    });
+
+}; 
+    
 
 exports.create = function(req, res) {
 

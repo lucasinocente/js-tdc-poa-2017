@@ -6,4 +6,6 @@ module.exports = function(app) {
         .get(message.list)
         .post(message.create);
 
+    app.route('/')
+        .get(message.chat)
 };

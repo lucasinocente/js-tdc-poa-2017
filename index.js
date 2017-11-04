@@ -9,7 +9,7 @@ app.set('port', (process.env.PORT || 3000));
 app.use(express.static(__dirname + '/public'));
 
 mongoose.Promise = global.Promise;
-mongoose.connect(process.env.MONGOURL || 'mongodb://localhost:27017/js2017');
+mongoose.connect(process.env.MONGOURL || 'mongodb://js-2017:js123@ds243285.mlab.com:43285/js-2017');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -17,9 +17,6 @@ app.use(bodyParser.json());
 app.set('views', __dirname + '/app/views');
 app.set('view engine', 'ejs');
 
-app.get('/', function(req, res) {
-  res.render('pages/chat');
-});
 
 //CORS middleware
 var allowCrossDomain = function(req, res, next) {

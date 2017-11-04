@@ -400,6 +400,8 @@ exports.create = function(req, res) {
 
 ### Exemplo de requisição pra teste do backend
 
+Vamos aproveitar e mandar duas mensagens pro servidor pra ver se tá tudo funcionando:
+
 Mensagem enviada pelo usuário:
 
 ```
@@ -426,3 +428,60 @@ curl -X POST -v \
 'http://localhost:3000/messages'
 ```
 
+E também vamos adicionar o comando `node index.js` dentro do `package.json` pra que possamos rodar com um comando padronizado `npm start`.
+
+```
+// package.json
+
+  [...]
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  [...]
+
+```
+
+---
+
+### Fazendo o template ler as mensagens
+
+Agora hora de fazer o template do ejs funcionar.
+
+Pra isso vamos primeiro passar a rota index pra dentro do controller e enviar a resposta da busca por mensagens.
+
+```
+// app/routes/messageRoutes.js
+
+[...]
+
+app.route('/')
+    .get(message.chat)
+
+[...]
+
+```
+
+E criar o controller chat:
+
+```
+// app/controllers/messageController.js
+
+
+[...]
+
+exports.chat = function(req, res) {
+
+    Message.find({}, function(err, messages) {
+        if (err)
+            res.send(err);
+        res.render('pages/chat', {messages: messages});
+    });
+
+}; 
+
+[...]
+
+```
+
+E claro, remover a rota `/` do `index.js`.

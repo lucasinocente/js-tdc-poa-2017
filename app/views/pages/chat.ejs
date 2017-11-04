@@ -19,23 +19,32 @@
 </head>
 <body>
   <div class="container">
+
+    <% messages.forEach(function(message,index) { %>
         
         <div class="message">
-            <div class="card w-55 float-left bg-light">
-                <div class="card-body">
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+
+            <% if (message.status == "received") { %>
+            
+                <div class="card w-55 float-left bg-light">
+                    <div class="card-body">
+                        <p class="card-text"><%= message.content %></p>
+                    </div>
                 </div>
-            </div>
+
+            <% } else { %>
+
+                <div class="card w-55 float-right bg-info text-white">
+                    <div class="card-body">
+                        <p class="card-text"><%= message.content %></p>
+                    </div>
+                </div>
+
+            <% } %>
+
         </div>
 
-
-        <div class="message">
-            <div class="card w-55 float-right bg-info text-white">
-                <div class="card-body">
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                </div>
-            </div>
-        </div>
+    <% }); %>
 
   </div>
 
