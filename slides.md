@@ -810,3 +810,67 @@ curl -X POST -v \
 }' \
 'http://localhost:3000/messages'
 ```
+
+E podemos acessar em http://localhost:3000/1
+
+
+Porém, isso não faz o socket enviar pra sala certa, ele envia pra todas.
+
+---
+
+### Fazer socket enviar pra sala certa
+
+Usaremos o pathname `/1` para ser a nossa sala. 
+
+Precisamos conectar nosso client à sala `/:id`:
+
+```
+// public/javascripts/scripts.js
+
+var room = window.location.pathname;
+
+var socket = io.connect();
+
+socket.on('connect', function() {
+    socket.emit('room', room);
+});
+
+[...]
+
+```
+
+Precisamos conectar nosso server à sala `/:id`:
+
+```
+// index.js
+
+io.sockets.on('connection', function(socket) {
+  socket.on('room', function(room) {
+      socket.join(room);
+  });
+});
+
+```
+
+E enviar à partir do nosso controller quando uma mensagem é salva:
+
+```
+// /app/controllers/messageController.js
+
+exports.create = function(req, res) {
+
+    var newMessage = new Message(req.body);
+    var room = '/' + req.body.room;
+
+    newMessage.save(function(err, message) {
+        if (err) {
+            res.send(err);
+        } else {
+            io.in(room).emit('message', message);
+            res.json(message);
+        }
+    });
+
+};
+
+```

@@ -29,12 +29,15 @@ exports.chat = function(req, res) {
 exports.create = function(req, res) {
 
     var newMessage = new Message(req.body);
+    var room = '/' + req.body.room;
+
+    console.log('room:', room)
 
     newMessage.save(function(err, message) {
         if (err) {
             res.send(err);
         } else {
-            io.emit('message', message);
+            io.in(room).emit('message', message);
             res.json(message);
         }
     });
