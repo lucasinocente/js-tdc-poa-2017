@@ -222,7 +222,7 @@ app.get('/', function(req, res) {
             <div class="card-body">
                 <div class="row">
                     <div class="col-11">
-                        <input type="text" class="form-control" placeholder="First name">
+                        <input type="text" class="form-control" placeholder="Type your message here...">
                     </div>
                     <div class="col">
                         <button class="btn btn-info btn-block">></button>
@@ -553,7 +553,7 @@ Depois disso precisamos editar o index.ejs:
                 <div class="card-body">
                     <div class="row">
                         <div class="col-9 col-sm-10">
-                            <input type="text" class="form-control" placeholder="First name">
+                            <input type="text" class="form-control" placeholder="Type your message here...">
                         </div>
                         <div class="col-3 col-sm-2">
                             <button class="btn btn-info btn-block">></button>
@@ -828,6 +828,7 @@ Precisamos conectar nosso client à sala `/:id`:
 // public/javascripts/scripts.js
 
 var room = window.location.pathname;
+var room = room.replace("/", "");
 
 var socket = io.connect();
 
@@ -860,7 +861,7 @@ E enviar à partir do nosso controller quando uma mensagem é salva:
 exports.create = function(req, res) {
 
     var newMessage = new Message(req.body);
-    var room = '/' + req.body.room;
+    var room = req.body.room;
 
     newMessage.save(function(err, message) {
         if (err) {
@@ -872,5 +873,64 @@ exports.create = function(req, res) {
     });
 
 };
+
+```
+
+----
+
+### Envia mensagem do usuário à partir do formulário
+
+Vamos lá, primeiro podemos usar o bom e velho onClick:
+
+```
+// /app/views/pages/chat.ejs
+
+                
+    <div class="col-3 col-sm-2">
+        <button class="btn btn-info btn-block" onclick="sendMessage()">></button>
+    </div>
+
+
+```
+
+```
+// public/javascripts/scripts.js
+
+function sendMessage() {
+
+    event.preventDefault();
+
+    var message = renderMessage();
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "http://localhost:3000/messages", true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(JSON.stringify(message));
+
+    xhr.onreadystatechange = function() {
+        if (this.readyState === 4 && this.status === 200) {
+            resetForm();
+        }
+    };
+
+}
+
+function renderMessage() {
+    
+    var content = document.getElementById('message').value;
+
+    var message = {
+        content: content,
+        status: "sent",
+        room: room
+    };
+
+    return message;
+
+}
+
+function resetForm() {
+    document.getElementById('message').value = "";
+}
 
 ```

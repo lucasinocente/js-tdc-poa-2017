@@ -29,7 +29,7 @@ exports.chat = function(req, res) {
 exports.create = function(req, res) {
 
     var newMessage = new Message(req.body);
-    var room = '/' + req.body.room;
+    var room = req.body.room;
 
     console.log('room:', room)
 
