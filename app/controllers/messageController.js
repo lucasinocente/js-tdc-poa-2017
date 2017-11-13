@@ -43,3 +43,16 @@ exports.create = function(req, res) {
     });
 
 };
+
+
+exports.chat = function(req, res) {
+    
+    var room = req.params.room
+
+    Message.find({ 'room': room }, function(err, messages) {
+        if (err)
+            res.send(err);
+        res.render('pages/chat', {messages: messages});
+    });
+
+}; 

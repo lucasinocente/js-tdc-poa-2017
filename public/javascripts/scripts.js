@@ -3,18 +3,15 @@
 // Socket.io
 // **********
 
-var room = window.location.pathname;
-var room = room.replace("/", "");
-
-var socket = io.connect();
+const room = window.location.pathname.replace("/", "");
+const socket = io.connect();
 
 socket.on('connect', function() {
     socket.emit('room', room);
-    console.log('room:', room);
+    console.log('Conectado na room:', room);
 });
 
 socket.on('message', function(message){
-    console.log('message', message);
     renderTemplate(message);
 });
 
@@ -24,10 +21,9 @@ socket.on('message', function(message){
 // Templates
 // **********
 
-
 function renderTemplate(message) {
 
-    var node = createNode();
+    let node = createNode();
 
     node.className = 'message';
     node.innerHTML = getMessageHtml(message);
@@ -42,7 +38,7 @@ function createNode() {
 
 function getMessageHtml(message) {
 
-    var className = getClassName(message.status);
+    let className = getClassName(message.status);
 
     return content = '<div class="' + className + '"> \
                           <div class="card-body">\
@@ -54,7 +50,7 @@ function getMessageHtml(message) {
 
 function getClassName(status) {
 
-    var className;
+    let className;
 
     if (status == "received") {
         className = "card w-55 float-left bg-light";
@@ -91,9 +87,9 @@ function sendMessage() {
 
     event.preventDefault();
 
-    var message = renderMessage();
+    let message = renderMessage();
 
-    var xhr = new XMLHttpRequest();
+    let xhr = new XMLHttpRequest();
     xhr.open("POST", "http://localhost:3000/messages", true);
     xhr.setRequestHeader('Content-Type', 'application/json');
     xhr.send(JSON.stringify(message));
@@ -108,9 +104,9 @@ function sendMessage() {
 
 function renderMessage() {
     
-    var content = document.getElementById('message').value;
+    const content = document.getElementById('message').value;
 
-    var message = {
+    let message = {
         content: content,
         status: "sent",
         room: room
