@@ -11,7 +11,7 @@ app.set('port', (process.env.PORT || 3000));
 app.use(express.static(__dirname + '/public'));
 
 mongoose.Promise = global.Promise;
-mongoose.connect(process.env.MONGOURL || 'mongodb://127.0.0.1:27017/dbb');
+mongoose.connect(process.env.MONGOURL || 'mongodb://127.0.0.1:27017/chat-db');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -19,26 +19,11 @@ app.use(bodyParser.json());
 app.set('views', __dirname + '/app/views');
 app.set('view engine', 'ejs');
 
-
-//CORS middleware
-var allowCrossDomain = function(req, res, next) {
-  
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-    res.header('Access-Control-Allow-Headers', 'Content-Type');
-
-    next();
-
-}
-
 io.sockets.on('connection', function(socket) {
   socket.on('room', function(room) {
       socket.join(room);
   });
 });
-
-  
-app.use(allowCrossDomain);
 
 var routes = require('./app/routes/messageRoutes');
 routes(app);
